@@ -1,10 +1,8 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { 
-  Sparkles, Download, FileText, Bot, Target, 
-  BarChart3, Layout, Layers, User, ShieldCheck, Printer
+  Sparkles, Download, FileText, BarChart3, Layout, Layers, Printer
 } from 'lucide-react';
 import { exportResumeToDocx } from '@/lib/export-docx';
 import { exportResumeToPdf } from '@/lib/export-pdf';
@@ -59,20 +57,18 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange, resume,
                 <span className="text-lg font-black tracking-tight text-slate-900 flex items-center gap-1">
                   ResumeForge <span className="text-indigo-600 font-extrabold text-xs uppercase px-1.5 py-0.5 bg-indigo-50 rounded-md border border-indigo-100">AI</span>
                 </span>
-                <span className="block text-[10px] text-slate-500 -mt-1 font-medium">ATS Career Consultant</span>
+                <span className="block text-[10px] text-slate-500 -mt-1 font-medium">ATS Resume Builder</span>
               </div>
             </button>
 
-            {/* Navigation Tabs */}
+            {/* Navigation Tabs - Exclusively Resume Focused */}
             <nav className="hidden lg:flex items-center gap-1">
               {[
                 { id: 'dashboard', label: 'Dashboard', icon: Layers },
                 { id: 'builder', label: 'Resume Builder', icon: FileText },
-                { id: 'ai-agent', label: 'AI Agent', icon: Sparkles, badge: 'Fixes' },
+                { id: 'ai-agent', label: 'Resume AI Agent', icon: Sparkles, badge: 'Smart Edits' },
                 { id: 'ats-score', label: 'ATS Score', icon: BarChart3, badge: `${atsScore}/100` },
-                { id: 'job-matcher', label: 'Job Matcher', icon: Target },
-                { id: 'templates', label: '10 Templates', icon: Layout },
-                { id: 'career-coach', label: 'Career Coach', icon: Bot },
+                { id: 'templates', label: 'Resume Templates', icon: Layout },
               ].map(tab => {
                 const Icon = tab.icon;
                 const isActive = currentTab === tab.id;
@@ -102,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange, resume,
             </nav>
           </div>
 
-          {/* Action Export Buttons & Profile */}
+          {/* Action Export Buttons */}
           <div className="flex items-center gap-2">
             {/* Quick Export DOCX */}
             <button
@@ -150,4 +146,3 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onTabChange, resume,
     </header>
   );
 };
-

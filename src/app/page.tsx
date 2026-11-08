@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { ResumeData } from '@/types/resume';
+import { UserProfile } from '@/types/auth';
 import { storage } from '@/lib/storage';
 import { calculateATSScore } from '@/lib/ats-scorer';
 import { INITIAL_RESUME } from '@/lib/constants';
@@ -9,11 +10,13 @@ import { Navbar } from '@/components/layout/Navbar';
 import { LandingPage } from '@/components/landing/LandingPage';
 import { MainDashboard } from '@/components/dashboard/MainDashboard';
 import { ResumeBuilderWorkspace } from '@/components/builder/ResumeBuilderWorkspace';
-import { CareerCoachPanel } from '@/components/career-coach/CareerCoachPanel';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 export default function HomePage() {
   const [currentTab, setCurrentTab] = useState<string>('landing');
   const [resume, setResume] = useState<ResumeData>(INITIAL_RESUME);
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => storage.getUserProfile());
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   // Load from localStorage on mount
@@ -22,6 +25,10 @@ export default function HomePage() {
     const saved = storage.getCurrentResume();
     if (saved) {
       setResume(saved);
+    }
+    const prof = storage.getUserProfile();
+    if (prof) {
+      setUserProfile(prof);
     }
   }, []);
 
@@ -49,7 +56,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans">
       {/* Top Navbar */}
       <Navbar
         currentTab={currentTab}
@@ -63,7 +70,8 @@ export default function HomePage() {
         {currentTab === 'landing' && (
           <LandingPage
             onStartBuilding={() => setCurrentTab('builder')}
-            onAnalyzeResume={() => setCurrentTab('ats-score')}
+            onExploreTemplates={() => setCurrentTab('templates')}
+            onImproveResume={() => setCurrentTab('ai-agent')}
           />
         )}
 
@@ -108,16 +116,6 @@ export default function HomePage() {
           </div>
         )}
 
-        {currentTab === 'job-matcher' && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <ResumeBuilderWorkspace
-              resume={resume}
-              onChange={handleUpdateResume}
-              activeSubTab="job-matcher"
-            />
-          </div>
-        )}
-
         {currentTab === 'templates' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <ResumeBuilderWorkspace
@@ -127,17 +125,15 @@ export default function HomePage() {
             />
           </div>
         )}
-
-        {currentTab === 'career-coach' && (
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <CareerCoachPanel
-              resume={resume}
-              onUpdateResume={handleUpdateResume}
-            />
-          </div>
-        )}
       </main>
+
+      {/* Auth / Profile Modal */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        currentUser={userProfile}
+        onUserUpdate={setUserProfile}
+      />
     </div>
   );
 }
-

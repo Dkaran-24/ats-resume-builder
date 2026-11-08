@@ -5,9 +5,10 @@ import { ResumeData } from '@/types/resume';
 import { UserActivity } from '@/types/auth';
 import { storage } from '@/lib/storage';
 import { 
-  PlusCircle, UploadCloud, BarChart3, Sparkles, Target, 
-  FolderKanban, Layout, Bot, Clock, ArrowRight, CheckCircle2,
-  Copy, Trash2, Edit3, FileText, TrendingUp, History, Download
+  PlusCircle, UploadCloud, BarChart3, Sparkles, 
+  FolderKanban, Layout, Clock, ArrowRight, CheckCircle2,
+  Copy, Trash2, Edit3, FileText, TrendingUp, History, Download,
+  BookOpen, SplitSquareVertical
 } from 'lucide-react';
 
 interface MainDashboardProps {
@@ -26,7 +27,6 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
   const [resumes, setResumes] = useState<ResumeData[]>(() => storage.getAllResumes());
   const [activities, setActivities] = useState<UserActivity[]>(() => storage.getActivities());
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [uploadedFileName, setUploadedFileName] = useState('');
 
   const handleCreateNew = () => {
     const title = prompt('Enter a name for your new resume:', 'New Professional Resume');
@@ -64,12 +64,11 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadedFileName(file.name);
       setTimeout(() => {
         alert(`Resume "${file.name}" successfully parsed! Sections have been extracted and mapped to the ATS editor.`);
         setShowUploadModal(false);
         onNavigateTab('builder');
-      }, 900);
+      }, 700);
     }
   };
 
@@ -77,7 +76,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
     {
       id: 'create',
       title: 'Create New Resume',
-      desc: 'Build an ATS-optimized resume step-by-step with intelligent section wizards.',
+      desc: 'Build an ATS-optimized resume step-by-step with structured section wizards.',
       icon: PlusCircle,
       color: 'bg-indigo-600 text-white',
       badge: 'Step-by-step',
@@ -93,36 +92,36 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
       onClick: () => setShowUploadModal(true)
     },
     {
+      id: 'ai-agent',
+      title: 'Resume AI Agent',
+      desc: 'Instruct the AI to rewrite experience, polish summary, format, and apply structured edits.',
+      icon: Sparkles,
+      color: 'bg-purple-600 text-white',
+      badge: 'Real AI Edits',
+      onClick: () => onNavigateTab('ai-agent')
+    },
+    {
       id: 'analyze',
-      title: 'Analyze My Resume',
-      desc: 'Get an instant ATS score out of 100 with category-wise breakdown & radar chart.',
+      title: 'Analyze ATS Compatibility',
+      desc: 'Get an instant ATS score out of 100 with radar chart and category breakdown.',
       icon: BarChart3,
       color: 'bg-emerald-600 text-white',
       badge: `${atsScore}/100 Score`,
       onClick: () => onNavigateTab('ats-score')
     },
     {
-      id: 'improve',
-      title: 'Improve Resume with AI',
-      desc: 'AI Resume Agent detects weak verbs, grammar bugs, and provides 1-click fixes.',
-      icon: Sparkles,
-      color: 'bg-purple-600 text-white',
-      badge: 'Action Plan',
-      onClick: () => onNavigateTab('ai-agent')
-    },
-    {
-      id: 'match',
-      title: 'Match with Job Description',
-      desc: 'Paste a target job description to uncover keyword gaps and match percentage.',
-      icon: Target,
-      color: 'bg-amber-600 text-white',
-      badge: 'Keyword Match',
-      onClick: () => onNavigateTab('job-matcher')
+      id: 'templates',
+      title: 'Resume Templates',
+      desc: 'Choose from 10 single-column ATS templates: Classic, Modern, Tech, Executive.',
+      icon: Layout,
+      color: 'bg-cyan-600 text-white',
+      badge: '10 Templates',
+      onClick: () => onNavigateTab('templates')
     },
     {
       id: 'saved',
       title: 'My Saved Resumes',
-      desc: 'Manage versions, duplicates, and job-tailored resumes in one unified place.',
+      desc: 'Manage your versions, duplicates, and role-tailored resumes in one place.',
       icon: FolderKanban,
       color: 'bg-slate-800 text-white',
       badge: `${resumes.length} Active`,
@@ -132,22 +131,22 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
       }
     },
     {
-      id: 'templates',
-      title: 'Resume Templates',
-      desc: 'Explore 10 recruiter-tested templates: Classic ATS, Executive, Modern, Tech.',
-      icon: Layout,
-      color: 'bg-cyan-600 text-white',
-      badge: '10 Templates',
-      onClick: () => onNavigateTab('templates')
+      id: 'compare',
+      title: 'Before & After Comparison',
+      desc: 'Inspect a visual comparison between your raw draft and the AI-optimized resume.',
+      icon: SplitSquareVertical,
+      color: 'bg-amber-600 text-white',
+      badge: 'Diff Viewer',
+      onClick: () => onNavigateTab('builder')
     },
     {
-      id: 'coach',
-      title: 'Career AI Assistant',
-      desc: 'Ask Career Coach AI for interview prep, bullet point rewrites, and career advice.',
-      icon: Bot,
+      id: 'verbs',
+      title: 'Action Verbs Library',
+      desc: 'Browse 100+ categorized power verbs to replace weak phrases in your experience.',
+      icon: BookOpen,
       color: 'bg-rose-600 text-white',
-      badge: '24/7 Coach',
-      onClick: () => onNavigateTab('career-coach')
+      badge: '100+ Verbs',
+      onClick: () => onNavigateTab('builder')
     },
   ];
 
@@ -162,7 +161,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-400/20">
               ResumeForge AI Dashboard
             </span>
-            <span className="text-xs text-slate-400">Pro Plan Active</span>
+            <span className="text-xs text-slate-400">ATS Resume Builder</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
             Welcome back, {currentResume.personalInfo.fullName || 'Professional'}!
@@ -177,7 +176,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
             onClick={() => onNavigateTab('builder')}
             className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2"
           >
-            <Edit3 className="w-4 h-4" /> Edit Active Resume
+            <Edit3 className="w-4 h-4" /> Open Resume Builder
           </button>
         </div>
       </div>
@@ -191,7 +190,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
             <FolderKanban className="w-4 h-4 text-indigo-600" />
           </div>
           <div className="text-2xl font-black text-slate-900 mt-2">{resumes.length}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">Across all job targets</div>
+          <div className="text-[11px] text-slate-400 mt-0.5">Across all roles</div>
         </div>
 
         {/* Metric 2 */}
@@ -203,7 +202,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
           <div className="text-sm font-bold text-slate-900 mt-2 truncate">
             {currentResume.title}
           </div>
-          <div className="text-[11px] text-emerald-600 mt-0.5">Autosaved today</div>
+          <div className="text-[11px] text-emerald-600 mt-0.5">Autosaved in session</div>
         </div>
 
         {/* Metric 3 */}
@@ -216,27 +215,27 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
             <span className="text-2xl font-black text-emerald-600">{atsScore}</span>
             <span className="text-xs text-slate-400">/ 100</span>
           </div>
-          <div className="text-[11px] text-emerald-600 mt-0.5">High Compatibility Rating</div>
+          <div className="text-[11px] text-emerald-600 mt-0.5">ATS Readiness Rating</div>
         </div>
 
         {/* Metric 4 */}
         <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-subtle">
           <div className="flex items-center justify-between text-xs text-slate-500">
             <span>Target Role</span>
-            <Target className="w-4 h-4 text-purple-600" />
+            <FileText className="w-4 h-4 text-purple-600" />
           </div>
           <div className="text-sm font-bold text-slate-900 mt-2 truncate">
-            {currentResume.targetRole || 'Full Stack Engineer'}
+            {currentResume.targetRole || 'Software Professional'}
           </div>
           <div className="text-[11px] text-slate-400 mt-0.5">Template: {currentResume.formatting?.template || 'Classic ATS'}</div>
         </div>
       </div>
 
-      {/* 8 Feature Cards Grid */}
+      {/* Resume Building Tools Grid */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-slate-900">Career Consultant Tools</h2>
-          <span className="text-xs text-slate-500">Select any tool to take action</span>
+          <h2 className="text-base font-bold text-slate-900">Resume Building & AI Tools</h2>
+          <span className="text-xs text-slate-500">Select any tool to create or improve</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -324,7 +323,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
 
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                   <span className="text-slate-400 text-[11px]">
-                    v{r.version || 1} • {r.experience.length} experiences
+                    v{r.version || 1} • {r.experience.length} roles
                   </span>
 
                   <div className="flex items-center gap-1">
@@ -350,24 +349,6 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
         </div>
       </div>
 
-      {/* Recent Activity Timeline */}
-      <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-subtle space-y-4">
-        <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-          <History className="w-4 h-4 text-slate-500" /> Recent Activities
-        </h2>
-        <div className="space-y-3">
-          {activities.map(act => (
-            <div key={act.id} className="flex items-center justify-between text-xs border-b border-slate-50 pb-2.5">
-              <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-indigo-600" />
-                <span className="font-semibold text-slate-800">{act.description}</span>
-              </div>
-              <span className="text-slate-400">{act.timestamp}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
@@ -385,7 +366,7 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
             </div>
 
             <p className="text-xs text-slate-600">
-              Upload your current resume (.pdf, .docx, or .txt). Our AI parser will extract your experience, education, and skills.
+              Upload your current resume (.pdf, .docx, or .txt). The editor will import your experience, education, and skills.
             </p>
 
             <div className="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-xl p-8 text-center bg-slate-50/50 cursor-pointer relative">
@@ -414,4 +395,3 @@ export const MainDashboard: React.FC<MainDashboardProps> = ({
     </div>
   );
 };
-

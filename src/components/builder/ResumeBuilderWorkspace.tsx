@@ -4,21 +4,23 @@ import React, { useState } from 'react';
 import { ResumeData } from '@/types/resume';
 import { ResumeRenderer } from '@/components/templates/ResumeRenderer';
 import { ResumeWizard } from '@/components/wizard/ResumeWizard';
-import { AIAgentPanel } from '@/components/ai-agent/AIAgentPanel';
+import { ResumeAIAgentPanel } from '@/components/ai-agent/ResumeAIAgentPanel';
 import { ATSScorePanel } from '@/components/ats-analyzer/ATSScorePanel';
-import { JobMatcherPanel } from '@/components/job-matcher/JobMatcherPanel';
 import { TemplateSelector } from '@/components/formatting/TemplateSelector';
+import { BeforeAfterCompare } from '@/components/builder/BeforeAfterCompare';
+import { ActionVerbsBank } from '@/components/tools/ActionVerbsBank';
+import { BulletPointChecker } from '@/components/tools/BulletPointChecker';
 import { exportResumeToDocx } from '@/lib/export-docx';
 import { exportResumeToPdf } from '@/lib/export-pdf';
 import { 
-  FileText, Sparkles, BarChart3, Target, Layout, Download, 
-  ZoomIn, ZoomOut, RotateCcw, Check, Eye, Printer, SplitSquareVertical
+  FileText, Sparkles, BarChart3, Layout, Download, 
+  ZoomIn, ZoomOut, SplitSquareVertical, BookOpen, Zap
 } from 'lucide-react';
 
 interface ResumeBuilderWorkspaceProps {
   resume: ResumeData;
   onChange: (updated: ResumeData) => void;
-  activeSubTab?: 'wizard' | 'ai-agent' | 'ats-score' | 'job-matcher' | 'templates';
+  activeSubTab?: 'wizard' | 'ai-agent' | 'ats-score' | 'templates' | 'compare' | 'verbs';
 }
 
 export const ResumeBuilderWorkspace: React.FC<ResumeBuilderWorkspaceProps> = ({
@@ -26,9 +28,8 @@ export const ResumeBuilderWorkspace: React.FC<ResumeBuilderWorkspaceProps> = ({
   onChange,
   activeSubTab = 'wizard'
 }) => {
-  const [subTab, setSubTab] = useState<'wizard' | 'ai-agent' | 'ats-score' | 'job-matcher' | 'templates'>(activeSubTab);
+  const [subTab, setSubTab] = useState<'wizard' | 'ai-agent' | 'ats-score' | 'templates' | 'compare' | 'verbs'>(activeSubTab);
   const [zoom, setZoom] = useState<number>(0.85);
-  const [compareMode, setCompareMode] = useState<boolean>(false);
   const [exporting, setExporting] = useState<boolean>(false);
 
   const handleDocxExport = async () => {
@@ -57,10 +58,11 @@ export const ResumeBuilderWorkspace: React.FC<ResumeBuilderWorkspaceProps> = ({
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {[
             { id: 'wizard', label: 'Editor Wizard', icon: FileText },
-            { id: 'ai-agent', label: 'AI Agent Fixes', icon: Sparkles },
+            { id: 'ai-agent', label: 'Resume AI Agent', icon: Sparkles, badge: 'Real AI' },
             { id: 'ats-score', label: 'ATS Score Analyzer', icon: BarChart3 },
-            { id: 'job-matcher', label: 'Job Matcher', icon: Target },
-            { id: 'templates', label: 'Templates & Design', icon: Layout },
+            { id: 'templates', label: '10 Templates', icon: Layout },
+            { id: 'compare', label: 'Before & After Diff', icon: SplitSquareVertical },
+            { id: 'verbs', label: 'Action Verbs Lab', icon: BookOpen },
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = subTab === tab.id;
@@ -77,12 +79,19 @@ export const ResumeBuilderWorkspace: React.FC<ResumeBuilderWorkspaceProps> = ({
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    isActive ? 'bg-indigo-500 text-white' : 'bg-indigo-100 text-indigo-700'
+                  }`}>
+                    {tab.badge}
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
 
-        {/* Right Tools: Zoom, Compare, Exports */}
+        {/* Right Tools: Zoom, Exports */}
         <div className="flex items-center gap-2">
           {/* Zoom controls */}
           <div className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs text-slate-600">
@@ -127,26 +136,33 @@ export const ResumeBuilderWorkspace: React.FC<ResumeBuilderWorkspaceProps> = ({
 
       {/* Main Split Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Active Interactive Tool (Wizard / AI Agent / Score / Matcher / Templates) */}
+        {/* Left Column: Active Interactive Tool */}
         <div className="lg:col-span-6 space-y-4">
           {subTab === 'wizard' && (
             <ResumeWizard resume={resume} onChange={onChange} />
           )}
 
           {subTab === 'ai-agent' && (
-            <AIAgentPanel resume={resume} onUpdateResume={onChange} />
+            <ResumeAIAgentPanel resume={resume} onUpdateResume={onChange} />
           )}
 
           {subTab === 'ats-score' && (
             <ATSScorePanel resume={resume} onApplyAction={() => setSubTab('wizard')} />
           )}
 
-          {subTab === 'job-matcher' && (
-            <JobMatcherPanel resume={resume} onOptimizeResume={onChange} />
-          )}
-
           {subTab === 'templates' && (
             <TemplateSelector resume={resume} onChange={onChange} />
+          )}
+
+          {subTab === 'compare' && (
+            <BeforeAfterCompare currentResume={resume} />
+          )}
+
+          {subTab === 'verbs' && (
+            <div className="space-y-4">
+              <BulletPointChecker />
+              <ActionVerbsBank />
+            </div>
           )}
         </div>
 
@@ -162,4 +178,3 @@ export const ResumeBuilderWorkspace: React.FC<ResumeBuilderWorkspaceProps> = ({
     </div>
   );
 };
-

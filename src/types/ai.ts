@@ -1,3 +1,5 @@
+import { ResumeData } from './resume';
+
 export type IssueSeverity = 'critical' | 'warning' | 'info';
 export type IssueCategory = 'grammar' | 'quality' | 'ats' | 'impact' | 'formatting';
 
@@ -45,24 +47,33 @@ export interface ATSAnalysisResult {
   disclaimer: string;
 }
 
-export interface JobMatchResult {
-  jobTitle: string;
-  company?: string;
-  matchPercentage: number;
-  extractedRequirements: string[];
-  requiredTechnicalSkills: string[];
-  requiredSoftSkills: string[];
-  matchingKeywords: string[];
-  missingKeywords: string[];
-  skillsGap: string[];
-  experienceGap: string[];
-  suggestedImprovements: {
-    section: string;
-    currentContent: string;
-    suggestedContent: string;
-    reason: string;
-  }[];
-  verdict: 'Strong Match' | 'Moderate Match' | 'Low Match';
+export interface ProposedChange {
+  id: string;
+  section: 'personalInfo' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'general';
+  title: string;
+  before: string;
+  after: string;
+  reason: string;
+  accepted?: boolean;
+}
+
+export interface AIResumeAgentRequest {
+  userMessage: string;
+  currentResume: ResumeData;
+  targetJobDescription?: string;
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>;
+}
+
+export interface AIResumeAgentResponse {
+  success: boolean;
+  message: string;
+  isResumeRelated: boolean;
+  targetSections?: string[];
+  proposedChanges: ProposedChange[];
+  updatedResume?: ResumeData;
+  error?: string;
+  code?: 'API_KEY_MISSING' | 'API_ERROR' | 'INVALID_REQUEST' | 'RATE_LIMIT' | 'TIMEOUT' | 'MALFORMED_RESPONSE';
+  configuredEnvVars?: string[];
 }
 
 export interface ChatMessage {
@@ -70,10 +81,8 @@ export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
-  suggestedActions?: {
-    label: string;
-    actionType: 'apply_summary' | 'add_skill' | 'improve_bullet' | 'switch_template';
-    payload?: any;
-  }[];
+  proposedChanges?: ProposedChange[];
+  updatedResume?: ResumeData;
+  isApplied?: boolean;
+  isRejected?: boolean;
 }
-
